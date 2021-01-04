@@ -41,59 +41,12 @@ class Generator(object):
     def __init__(self):
         self.p = Parameters()
 
-        # load training set
-        self.train_data_five = []
-        self.train_data_four = []
-        self.train_data_three = []
-        self.train_data_two = []
+        # load training set        
+        with open(r"mini_four.json", "r") as f:
+            self.train_data_four = json.load(f)
 
-        with open("/home/kym/research/autonomous_car_vision/lane_detection/code/Tusimple/fitting/dataset/five.json") as f:
-            while True:
-                line = f.readline()
-                if not line:
-                    break
-                jsonString = json.loads(line)
-                self.train_data_five.append(jsonString)
-
-        with open("/home/kym/research/autonomous_car_vision/lane_detection/code/Tusimple/fitting/dataset/four.json") as f:
-            while True:
-                line = f.readline()
-                if not line:
-                    break
-                jsonString = json.loads(line)
-                self.train_data_four.append(jsonString)
-
-        with open("/home/kym/research/autonomous_car_vision/lane_detection/code/Tusimple/fitting/dataset/three.json") as f:
-            while True:
-                line = f.readline()
-                if not line:
-                    break
-                jsonString = json.loads(line)
-                self.train_data_three.append(jsonString)
-
-        with open("/home/kym/research/autonomous_car_vision/lane_detection/code/Tusimple/fitting/dataset/two.json") as f:
-            while True:
-                line = f.readline()
-                if not line:
-                    break
-                jsonString = json.loads(line)
-                self.train_data_two.append(jsonString)
-
-        self.size_train = len(self.train_data_two) + len(self.train_data_three) + len(self.train_data_four) + len(self.train_data_five)
+        self.size_train = len(self.train_data_four)
         print(self.size_train)
-
-        # load test set
-        self.test_data = []
-        with open(self.p.test_root_url+'test_tasks_0627.json') as f:
-            #with open(self.p.test_root_url+'test_label.json') as f:
-            while True:
-                line = f.readline()
-                if not line:
-                    break
-                jsonString = json.loads(line)
-                self.test_data.append(jsonString)
-
-        self.size_test = len(self.test_data)
 
     #################################################################################################################
     ## Generate data as much as batchsize and augment data (filp, translation, rotation, gaussian noise, scaling)
