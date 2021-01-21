@@ -34,3 +34,22 @@ def Testing():
     else:
         lane_assistant = Assistant.Assistant()
         lane_assistant.load_weights(804, "tensor(0.5786)")
+	
+    ##############################
+    ## Check GPU
+    ##############################
+    print('Setup GPU mode')
+    if torch.cuda.is_available():
+        lane_assistant.cuda()
+
+    ##############################
+    ## testing
+    ##############################
+    print('Testing loop')
+    lane_assistant.evaluate_mode()
+
+    if p.mode == 0 : # check model with test data 
+        for _, _, _, test_image in loader.Generate():
+            _, _, ti = test(lane_assistant, np.array([test_image]))
+            cv2.imshow("test", ti[0])
+            cv2.waitKey(0)
