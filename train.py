@@ -114,3 +114,6 @@ def Training():
                     make_file.write( "epoch : " + str(epoch) + " loss : " + str(loss_p.cpu().data) )
                     make_file.write(evaluation.LaneEval.bench_one_submit("test_result_"+str(epoch)+"_"+str(idx)+".json", "test_label.json"))
                     make_file.write("\n")
+
+        if int(step)>700000:
+            break
