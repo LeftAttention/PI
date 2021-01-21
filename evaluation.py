@@ -51,3 +51,40 @@ class LaneEval(object):
         if len(gt) > 4:
             s -= min(line_accs)
         return s / max(min(4.0, len(gt)), 1.), fp / len(pred) if len(pred) > 0 else 0., fn / max(min(len(gt), 4.) , 1.)
+    
+    @staticmethod
+    def bench_one_submit(pred_file, gt_file):
+        try:
+            json_pred = [json.loads(line) for line in open(pred_file).readlines()]
+        except BaseException as e:
+            raise Exception('Fail to load json file of the prediction.')
+        json_gt = [json.loads(line) for line in open(gt_file).readlines()]
+        if len(json_gt) != len(json_pred):
+            raise Exception('We do not get the predictions of all the test tasks')
+        gts = {l['raw_file']: l for l in json_gt}
+        accuracy, fp, fn = 0., 0., 0.
+        for pred in json_pred:
+            if 'raw_file' not in pred or 'lanes' not in pred or 'run_time' not in pred:
+                raise Exception('raw_file or lanes or run_time not in some predictions.')
+            raw_file = pred['raw_file']
+            pred_lanes = pred['lanes']
+            run_time = pred['run_time']
+            if raw_file not in gts:
+                raise Exception('Some raw_file from your predictions do not exist in the test tasks.')
+            gt = gts[raw_file]
+            gt_lanes = gt['lanes']
+            y_samples = gt['h_samples']
+            try:
+                a, p, n = LaneEval.bench(pred_lanes, gt_lanes, y_samples, run_time)
+            except BaseException as e:
+                raise Exception('Format of lanes error.')
+            accuracy += a
+            fp += p
+            fn += n
+        num = len(gts)
+        # the first return parameter is the default ranking parameter
+        return json.dumps([
+            {'name': 'Accuracy', 'value': accuracy / num, 'order': 'desc'},
+            {'name': 'FP', 'value': fp / num, 'order': 'asc'},
+            {'name': 'FN', 'value': fn / num, 'order': 'asc'}
+        ])
