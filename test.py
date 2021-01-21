@@ -85,7 +85,36 @@ def Testing():
 
     elif p.mode == 3: #evaluation
         print("evaluate")
-        evaluation(loader, lane_assistant)	
+        evaluation(loader, lane_assistant)
+	
+############################################################################
+## evaluate on the test dataset
+############################################################################
+def evaluation(loader, lane_agent, index= -1, thresh = p.threshold_point, name = None):
+    result_data = deepcopy(loader.test_data)
+    progressbar = tqdm(range(loader.size_test//4))
+    for test_image, target_h, ratio_w, ratio_h, testset_index, gt in loader.Generate_Test():
+        x, y, _ = test(lane_agent, test_image, thresh, index)
+        x_ = []
+        y_ = []
+        for i, j in zip(x, y):
+            temp_x, temp_y = util.convert_to_original_size(i, j, ratio_w, ratio_h)
+            x_.append(temp_x)
+            y_.append(temp_y)
+        #x_, y_ = find_target(x_, y_, target_h, ratio_w, ratio_h)
+        x_, y_ = fitting(x_, y_, target_h, ratio_w, ratio_h)
+        result_data = write_result_json(result_data, x_, y_, testset_index)
+
+        #util.visualize_points_origin_size(x_[0], y_[0], test_image[0], ratio_w, ratio_h)
+        #print(gt.shape)
+        #util.visualize_points_origin_size(gt[0], y_[0], test_image[0], ratio_w, ratio_h)
+
+        progressbar.update(1)
+    progressbar.close()
+    if name == None:
+        save_result(result_data, "test_result.json")
+    else:
+        save_result(result_data, name)
 	
 ############################################################################
 ## test on the input test image
