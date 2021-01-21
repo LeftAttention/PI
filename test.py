@@ -190,3 +190,6 @@ def generate_result(confidance, offsets,instance, thresh):
                     y.append([point_y])
                 
     return x, y
+
+if __name__ == '__main__':
+    Testing()
