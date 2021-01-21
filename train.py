@@ -50,3 +50,18 @@ def Training():
     else:
         lane_agent = agent.Agent()
         lane_agent.load_weights(1912, "tensor(0.9420)")
+        
+    ##############################
+    ## Check GPU
+    ##############################
+    print('Setup GPU mode')
+    if torch.cuda.is_available():
+        lane_agent.cuda()
+        #torch.backends.cudnn.benchmark=True
+
+    ##############################
+    ## Loop for training
+    ##############################
+    print('Training loop')
+    step = 0
+    sampling_list = None
