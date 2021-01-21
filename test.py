@@ -168,6 +168,72 @@ def find_target(x, y, target_h, ratio_w, ratio_h):
     
     return out_x, out_y
 
+def fitting(x, y, target_h, ratio_w, ratio_h):
+    out_x = []
+    out_y = []
+    count = 0
+    x_size = p.x_size/ratio_w
+    y_size = p.y_size/ratio_h
+
+    for x_batch, y_batch in zip(x,y):
+        predict_x_batch = []
+        predict_y_batch = []
+        for i, j in zip(x_batch, y_batch):
+            min_y = min(j)
+            max_y = max(j)
+            temp_x = []
+            temp_y = []
+
+            jj = []
+            pre = -100
+            for temp in j[::-1]:
+                if temp > pre:
+                    jj.append(temp)
+                    pre = temp
+                else:
+                    jj.append(pre+0.00001)
+                    pre = pre+0.00001
+            sp = csaps.CubicSmoothingSpline(jj, i[::-1], smooth=0.0001)
+
+            last = 0
+            last_second = 0
+            last_y = 0
+            last_second_y = 0
+            for h in target_h[count]:
+                temp_y.append(h)
+                if h < min_y:
+                    temp_x.append(-2)
+                elif min_y <= h and h <= max_y:
+                    temp_x.append( sp([h])[0] )
+                    last = temp_x[-1]
+                    last_y = temp_y[-1]
+                    if len(temp_x)<2:
+                        last_second = temp_x[-1]
+                        last_second_y = temp_y[-1]
+                    else:
+                        last_second = temp_x[-2]
+                        last_second_y = temp_y[-2]
+                else:
+                    if last < last_second:
+                        l = int(last_second - float(-last_second_y + h)*abs(last_second-last)/abs(last_second_y+0.0001 - last_y))
+                        if l > x_size or l < 0 :
+                            temp_x.append(-2)
+                        else:
+                            temp_x.append(l)
+                    else:
+                        l = int(last_second + float(-last_second_y + h)*abs(last_second-last)/abs(last_second_y+0.0001 - last_y))
+                        if l > x_size or l < 0 :
+                            temp_x.append(-2)
+                        else:
+                            temp_x.append(l)
+            predict_x_batch.append(temp_x)
+            predict_y_batch.append(temp_y)
+        out_x.append(predict_x_batch)
+        out_y.append(predict_y_batch) 
+        count += 1
+
+    return out_x, out_y
+
 ############################################################################
 ## test on the input test image
 ############################################################################
