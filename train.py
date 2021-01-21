@@ -128,3 +128,5 @@ def testing(lane_agent, test_image, step, loss):
     lane_agent.training_mode()
     
     
+if __name__ == '__main__':
+    Training()
