@@ -82,7 +82,10 @@ def Testing():
         _, _, ti = test(lane_assistant, np.array([test_image]))
         cv2.imshow("test", ti[0])
         cv2.waitKey(0)
-	
+
+    elif p.mode == 3: #evaluation
+        print("evaluate")
+        evaluation(loader, lane_assistant)	
 	
 ############################################################################
 ## test on the input test image
