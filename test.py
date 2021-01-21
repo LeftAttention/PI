@@ -90,11 +90,11 @@ def Testing():
 ############################################################################
 ## evaluate on the test dataset
 ############################################################################
-def evaluation(loader, lane_agent, index= -1, thresh = p.threshold_point, name = None):
+def evaluation(loader, lane_assistant, index= -1, thresh = p.threshold_point, name = None):
     result_data = deepcopy(loader.test_data)
     progressbar = tqdm(range(loader.size_test//4))
     for test_image, target_h, ratio_w, ratio_h, testset_index, gt in loader.Generate_Test():
-        x, y, _ = test(lane_agent, test_image, thresh, index)
+        x, y, _ = test(lane_assistant, test_image, thresh, index)
         x_ = []
         y_ = []
         for i, j in zip(x, y):
