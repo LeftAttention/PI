@@ -117,6 +117,58 @@ def evaluation(loader, lane_agent, index= -1, thresh = p.threshold_point, name =
         save_result(result_data, name)
 	
 ############################################################################
+## linear interpolation for fixed y value on the test dataset, if you want to use python2, use this code
+############################################################################
+def find_target(x, y, target_h, ratio_w, ratio_h):
+    # find exact points on target_h
+    out_x = []
+    out_y = []
+    x_size = p.x_size/ratio_w
+    y_size = p.y_size/ratio_h
+    count = 0
+    for x_batch, y_batch in zip(x,y):
+        predict_x_batch = []
+        predict_y_batch = []
+        for i, j in zip(x_batch, y_batch):
+            min_y = min(j)
+            max_y = max(j)
+            temp_x = []
+            temp_y = []
+            for h in target_h[count]:
+                temp_y.append(h)
+                if h < min_y:
+                    temp_x.append(-2)
+                elif min_y <= h and h <= max_y:
+                    for k in range(len(j)-1):
+                        if j[k] >= h and h >= j[k+1]:
+                            #linear regression
+                            if i[k] < i[k+1]:
+                                temp_x.append(int(i[k+1] - float(abs(j[k+1] - h))*abs(i[k+1]-i[k])/abs(j[k+1]+0.0001 - j[k])))
+                            else:
+                                temp_x.append(int(i[k+1] + float(abs(j[k+1] - h))*abs(i[k+1]-i[k])/abs(j[k+1]+0.0001 - j[k])))
+                            break
+                else:
+                    if i[0] < i[1]:
+                        l = int(i[1] - float(-j[1] + h)*abs(i[1]-i[0])/abs(j[1]+0.0001 - j[0]))
+                        if l > x_size or l < 0 :
+                            temp_x.append(-2)
+                        else:
+                            temp_x.append(l)
+                    else:
+                        l = int(i[1] + float(-j[1] + h)*abs(i[1]-i[0])/abs(j[1]+0.0001 - j[0]))
+                        if l > x_size or l < 0 :
+                            temp_x.append(-2)
+                        else:
+                            temp_x.append(l)
+            predict_x_batch.append(temp_x)
+            predict_y_batch.append(temp_y)                            
+        out_x.append(predict_x_batch)
+        out_y.append(predict_y_batch)
+        count += 1
+    
+    return out_x, out_y
+
+############################################################################
 ## test on the input test image
 ############################################################################
 def test(lane_assistant, test_images, thresh = p.threshold_point, index= -1):
