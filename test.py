@@ -245,6 +245,15 @@ def write_result_json(result_data, x, y, testset_index):
     return result_data
 
 ############################################################################
+## save result by json form
+############################################################################
+def save_result(result_data, fname):
+    with open(fname, 'w') as make_file:
+        for i in result_data:
+            json.dump(i, make_file, separators=(',', ': '))
+            make_file.write("\n")
+		
+############################################################################
 ## test on the input test image
 ############################################################################
 def test(lane_assistant, test_images, thresh = p.threshold_point, index= -1):
