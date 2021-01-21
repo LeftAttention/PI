@@ -117,3 +117,14 @@ def Training():
 
         if int(step)>700000:
             break
+            
+def testing(lane_agent, test_image, step, loss):
+    lane_agent.evaluate_mode()
+
+    _, _, ti = test.test(lane_agent, np.array([test_image]))
+
+    cv2.imwrite('test_result/result_'+str(step)+'_'+str(loss)+'.png', ti[0])
+
+    lane_agent.training_mode()
+    
+    
