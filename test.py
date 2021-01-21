@@ -235,6 +235,16 @@ def fitting(x, y, target_h, ratio_w, ratio_h):
     return out_x, out_y
 
 ############################################################################
+## write result
+############################################################################
+def write_result_json(result_data, x, y, testset_index):
+    for index, batch_idx in enumerate(testset_index):
+        for i in x[index]:
+            result_data[batch_idx]['lanes'].append(i)
+            result_data[batch_idx]['run_time'] = 1
+    return result_data
+
+############################################################################
 ## test on the input test image
 ############################################################################
 def test(lane_assistant, test_images, thresh = p.threshold_point, index= -1):
