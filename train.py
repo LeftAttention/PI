@@ -91,3 +91,26 @@ def Training():
 
         sampling_list = copy.deepcopy(lane_agent.get_data_list())
         lane_agent.sample_reset()
+        
+        #evaluation
+        if epoch >= 0 and epoch%1 == 0:
+            print("evaluation")
+            lane_agent.evaluate_mode()
+            th_list = [0.8]
+            index = [3]
+            lane_agent.save_model(int(step/100), loss_p)
+
+            for idx in index:
+                print("generate result")
+                test.evaluation(loader, lane_agent, index = idx, name="test_result_"+str(epoch)+"_"+str(idx)+".json")
+
+            for idx in index:
+                print("compute score")
+                with open("/home/kym/Dropbox/eval_result2_"+str(idx)+"_.txt", 'a') as make_file:
+                    make_file.write( "epoch : " + str(epoch) + " loss : " + str(loss_p.cpu().data) )
+                    make_file.write(evaluation.LaneEval.bench_one_submit("test_result_"+str(epoch)+"_"+str(idx)+".json", "test_label.json"))
+                    make_file.write("\n")
+                with open("eval_result_"+str(idx)+"_.txt", 'a') as make_file:
+                    make_file.write( "epoch : " + str(epoch) + " loss : " + str(loss_p.cpu().data) )
+                    make_file.write(evaluation.LaneEval.bench_one_submit("test_result_"+str(epoch)+"_"+str(idx)+".json", "test_label.json"))
+                    make_file.write("\n")
