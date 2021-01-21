@@ -88,3 +88,7 @@ class LaneEval(object):
             {'name': 'FP', 'value': fp / num, 'order': 'asc'},
             {'name': 'FN', 'value': fn / num, 'order': 'asc'}
         ])
+    
+if __name__ == '__main__':
+    import sys
+    print(LaneEval.bench_one_submit("test_result.json", "test_label.json"))
