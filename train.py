@@ -46,17 +46,17 @@ def Training():
     ##############################
     print('Get agent')
     if p.model_path == "":
-        lane_agent = agent.Agent()
+        lane_assistant = agent.Agent()
     else:
-        lane_agent = agent.Agent()
-        lane_agent.load_weights(1912, "tensor(0.9420)")
+        lane_assistant = agent.Agent()
+        lane_assistant.load_weights(1912, "tensor(0.9420)")
         
     ##############################
     ## Check GPU
     ##############################
     print('Setup GPU mode')
     if torch.cuda.is_available():
-        lane_agent.cuda()
+        lane_assistant.cuda()
         #torch.backends.cudnn.benchmark=True
 
     ##############################
@@ -67,13 +67,13 @@ def Training():
     sampling_list = None
     
     for epoch in range(p.n_epoch):
-        lane_agent.training_mode()
+        lane_assistant.training_mode()
         for inputs, target_lanes, target_h, test_image, data_list in loader.Generate(sampling_list):
             #training
             #util.visualize_points(inputs[0], target_lanes[0], target_h[0])
             print("epoch : " + str(epoch))
             print("step : " + str(step))
-            loss_p = lane_agent.train(inputs, target_lanes, target_h, epoch, lane_agent, data_list)
+            loss_p = lane_assistant.train(inputs, target_lanes, target_h, epoch, lane_assistant, data_list)
             torch.cuda.synchronize()
             loss_p = loss_p.cpu().data
             
@@ -85,24 +85,24 @@ def Training():
                     update='append')
                 
             if step%100 == 0:
-                lane_agent.save_model(int(step/100), loss_p)
-                testing(lane_agent, test_image, step, loss_p)
+                lane_assistant.save_model(int(step/100), loss_p)
+                testing(lane_assistant, test_image, step, loss_p)
             step += 1
 
-        sampling_list = copy.deepcopy(lane_agent.get_data_list())
-        lane_agent.sample_reset()
+        sampling_list = copy.deepcopy(lane_assistant.get_data_list())
+        lane_assistant.sample_reset()
         
         #evaluation
         if epoch >= 0 and epoch%1 == 0:
             print("evaluation")
-            lane_agent.evaluate_mode()
+            lane_assistant.evaluate_mode()
             th_list = [0.8]
             index = [3]
-            lane_agent.save_model(int(step/100), loss_p)
+            lane_assistant.save_model(int(step/100), loss_p)
 
             for idx in index:
                 print("generate result")
-                test.evaluation(loader, lane_agent, index = idx, name="test_result_"+str(epoch)+"_"+str(idx)+".json")
+                test.evaluation(loader, lane_assistant, index = idx, name="test_result_"+str(epoch)+"_"+str(idx)+".json")
 
             for idx in index:
                 print("compute score")
@@ -118,14 +118,14 @@ def Training():
         if int(step)>700000:
             break
             
-def testing(lane_agent, test_image, step, loss):
-    lane_agent.evaluate_mode()
+def testing(lane_assistant, test_image, step, loss):
+    lane_assistant.evaluate_mode()
 
-    _, _, ti = test.test(lane_agent, np.array([test_image]))
+    _, _, ti = test.test(lane_assistant, np.array([test_image]))
 
     cv2.imwrite('test_result/result_'+str(step)+'_'+str(loss)+'.png', ti[0])
 
-    lane_agent.training_mode()
+    lane_assistant.training_mode()
     
     
 if __name__ == '__main__':
