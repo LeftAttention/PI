@@ -132,3 +132,16 @@ def test(lane_agent, test_images, thresh = p.threshold_point, index= -1):
         out_images.append(result_image)
         
     return out_x, out_y,  out_images
+
+############################################################################
+## eliminate result that has fewer points than threshold
+############################################################################
+def eliminate_fewer_points(x, y):
+    # eliminate fewer points
+    out_x = []
+    out_y = []
+    for i, j in zip(x, y):
+        if len(i)>2:
+            out_x.append(i)
+            out_y.append(j)     
+    return out_x, out_y
