@@ -46,9 +46,9 @@ def Training():
     ##############################
     print('Get agent')
     if p.model_path == "":
-        lane_assistant = agent.Agent()
+        lane_assistant = Assistant.Assistant()
     else:
-        lane_assistant = agent.Agent()
+        lane_assistant = Assistant.Assistant()
         lane_assistant.load_weights(1912, "tensor(0.9420)")
         
     ##############################
